@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hosptial Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        .chart-wrapper {
+            width: 400px;
+            height: 400px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hospital Management Analytics</h1>
+    
+    <!-- Charts Section -->
+    <div class="chart-container">
+        <!-- Appointments by Doctor Chart -->
+        <div class="chart-wrapper">
+            <h2>Appointments by Doctor</h2>
+            <canvas id="appointmentsPieChart"></canvas>
+        </div>
+        <!-- Patients by Doctor Chart -->
+        <div class="chart-wrapper">
+            <h2>Patients by Doctor</h2>
+            <canvas id="patientsBarChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- JSON Data -->
+    {{ doctor_names|json_script:"doctor-names-data" }}
+    {{ appointment_counts|json_script:"appointment-counts-data" }}
+    {{ patient_counts|json_script:"patient-counts-data" }}
+    
+    <!-- Script -->
+    <script>
+        // Parse JSON data
+        const doctorNames = JSON.parse(document.getElementById('doctor-names-data').textContent);
+        const appointmentCounts = JSON.parse(document.getElementById('appointment-counts-data').textContent);
+        const patientCounts = JSON.parse(document.getElementById('patient-counts-data').textContent);
+
+        // Chart for Appointments
+        const appointmentsCtx = document.getElementById('appointmentsPieChart').getContext('2d');
+        const appointmentsPieChart = new Chart(appointmentsCtx, {
+            type: 'pie',
+            data: {
+                labels: doctorNames,
+                datasets: [{
+                    label: 'Number of Appointments',
+                    data: appointmentCounts,
+                    backgroundColor: [
+                        'rgba(54, 69, 79, 1)',   /* Dark Slate */
+                        'rgba(89, 98, 105, 1)',  /* Charcoal Gray */
+                        'rgba(103, 58, 183, 1)', /* Deep Purple */
+                        'rgba(33, 37, 41, 1)',   /* Dark Gunmetal */
+                        'rgba(52, 152, 219, 1)', /* Deep Blue */
+                        'rgba(44, 62, 80, 1)'
+                    ],
+                    borderColor: [
+                    'rgba(54, 69, 79, 1)',   /* Dark Slate */
+                        'rgba(89, 98, 105, 1)',  /* Charcoal Gray */
+                        'rgba(103, 58, 183, 1)', /* Deep Purple */
+                        'rgba(33, 37, 41, 1)',   /* Dark Gunmetal */
+                        'rgba(52, 152, 219, 1)', /* Deep Blue */
+                        'rgba(44, 62, 80, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                }
+            }
+        });
+
+        // Chart for Patients
+        const patientsCtx = document.getElementById('patientsBarChart').getContext('2d');
+        const patientsBarChart = new Chart(patientsCtx, {
+            type: 'bar',
+            data: {
+                labels: doctorNames,
+                datasets: [{
+                    label: 'Number of Patients',
+                    data: patientCounts,
+                    backgroundColor: 'rgba(89, 98, 105, 1)',
+                    borderColor: 'rgba(89, 98, 105, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
